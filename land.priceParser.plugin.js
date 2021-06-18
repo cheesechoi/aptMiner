@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name        월부 부동산 매물 필터
+// @name        부동산 매물 필터
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
-// @grant       none
 // @version     0.1
 // @author      cheesy
-// @description 6/15/2021, 11:11:17 PM
+// @description Please use with violentmonkey
+// @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.js
+// @updateURL   https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.js
 // ==/UserScript==
   
 function waitUntilAptListLoaded() {
