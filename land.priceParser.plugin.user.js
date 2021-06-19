@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        land.naver.com price parser
+// @name        부동산 매물 가격 필터 for 
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
 // @version     0.1
