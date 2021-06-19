@@ -27,7 +27,7 @@ function checkMandantoryCondition(size) {
   return true;
 }
 
-function checkItemCondition(tradeType, floor) {
+function checkItemCondition(tradeType, floor, spec) {
  
     //매매, 전세
     if (tradeType != "전세" && tradeType != "매매") {
@@ -35,21 +35,27 @@ function checkItemCondition(tradeType, floor) {
       return false;
     }
 
+    // 세안고 제외
+    if (spec.includes("세안고")) {
+      //console.log('Filtered by floor - ', _floorInfo);
+      return false;
+    }
+  
     //// 층
     // 층 명확하지 않은 것 제외
     var _floorInfo = floor.replace("층", "").split('/'); // 
-    if ( _floorInfo[0] == "저" || _floorInfo[0] == "고") {
+    if (_floorInfo[0] == "저" || _floorInfo[0] == "고") {
       //console.log('Filtered by floor - ', _floorInfo);
       return false;
     }
     // 1층, 탑층 제외
-    if ( _floorInfo[0] == "1" || _floorInfo[0] == _floorInfo[1]) {
+    if (_floorInfo[0] == "1" || _floorInfo[0] == _floorInfo[1]) {
       //console.log('Filtered by floor - ', _floorInfo);
       return false;
     }
 
     // 5층 이상 건물에서 3층 미만 제외
-    if ( _floorInfo[1] >= 5 && _floorInfo[0] <= 3) {
+    if (_floorInfo[1] >= 5 && _floorInfo[0] <= 3) {
       //console.log('Filtered by floor - ', _floorInfo);
       return false;
     }
@@ -80,7 +86,7 @@ function getPrice_WeolbuStandard() {
     if (!(size in dictPricePerSize))
       dictPricePerSize[size] = { '매매':null, '전세':null, '갭':null, '전세가율':null };
 
-    if(!checkMandantoryCondition(tradeType, floor)) {
+    if(!checkItemCondition(tradeType, floor, spec)) {
       return;
     }
     
@@ -113,15 +119,14 @@ function addInfoToScreen(infos) {
       }
       
       var dl = Array.from(screenInfo).find(el => el.textContent.includes(size));
-      if (!dl) {
-        var cloned = document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl:nth-child(1)").cloneNode(true);
-        cloned.getElementsByClassName("title")[0].innerText = size;
-        cloned.getElementsByClassName("data")[0].innerText = priceInfo;
-        document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div").appendChild(cloned);
-      }
-      else {
-        dl.getElementsByClassName("data")[0].innerText = priceInfo;
-      }
+      if (dl)
+        dl.remove();        
+
+      var cloned = document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl:nth-child(1)").cloneNode(true);
+      cloned.getElementsByClassName("title")[0].innerText = size;
+      cloned.getElementsByClassName("data")[0].innerText = priceInfo;
+      document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div").appendChild(cloned);
+
     }
 }
 
