@@ -5,8 +5,8 @@
 // @version     0.1
 // @author      cheesy
 // @description Please use with violentmonkey
-// @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.js
-// @updateURL   https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.js
+// @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
+// @updateURL   https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
 // ==/UserScript==
   
 function waitUntilAptListLoaded() {
