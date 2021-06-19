@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        부동산 매물 가격 필터 for 
+// @name        부동산 매물 가격 필터 for 월부
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
 // @version     0.1
