@@ -78,8 +78,10 @@ function getPrice_WeolbuStandard() {
     var tradeType = ele.querySelector("div.price_line .type").innerText; // 매매, 전세
     var floor = ele.querySelectorAll("div.info_area .line .spec")[0].innerText.split(", ")[1]; // 3/10층
     var tradePrice = parsePrice(ele.querySelector("div.price_line .price").innerText); // 141000
-    var spec = ele.querySelectorAll("div.info_area .line .spec")[1].innerText; // 확장올수리, 정상입주, 수내중학군
+    var spec = ele.querySelectorAll("div.info_area .line .spec")[1]; // 확장올수리, 정상입주, 수내중학군
+    spec = spec?spec.innerText:""; 
 
+    
     if(!checkMandantoryCondition(size)) {
       return;
     }
