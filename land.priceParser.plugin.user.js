@@ -54,7 +54,7 @@ function checkItemCondition(tradeType, floor, spec) {
       return false;
     }
 
-    // 5층 이상 건물에서 3층 미만 제외
+    // 5층 이상 건물에서 3층 이하 제외
     if (_floorInfo[1] >= 5 && _floorInfo[0] <= 3) {
       //console.log('Filtered by floor - ', _floorInfo);
       return false;
@@ -125,6 +125,7 @@ function addInfoToScreen(infos) {
         dl.remove();        
 
       var cloned = document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl:nth-child(1)").cloneNode(true);
+      cloned.setAttribute("added", true);
       cloned.getElementsByClassName("title")[0].innerText = size;
       cloned.getElementsByClassName("data")[0].innerText = priceInfo;
       document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div").appendChild(cloned);
@@ -152,7 +153,7 @@ function sortOnKeys(dict) {
 }
 
 
-var global_apt_height = 0;
+var g_lastSelectedApt = "";
 
 function addObserverIfDesiredNodeAvailable() {
   
@@ -169,13 +170,19 @@ function addObserverIfDesiredNodeAvailable() {
             || (!addedNode.classList.contains('infinite_scroll') && !addedNode.classList.contains('item'))) {
           return;
         }
-        
-        // 아파트 선택 취소하는 경우 예외처리
-        if (document.querySelector("#complexOverviewList > div > div.item_area > div") == null) {
-          global_apt_height = 0;
+
+        if (!document.querySelector("#complexTitle")) {
+          console.log("Unexpected issues #1");
           return;
         }
 
+        if (document.querySelector("#complexTitle").innerText != g_lastSelectedApt) {
+          document.querySelectorAll("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl").forEach( function (ele) {
+            if (ele.hasAttribute("added"))
+              ele.remove();
+          });
+          g_lastSelectedApt = document.querySelector("#complexTitle").innerText;
+        }
 
         result = getPrice_WeolbuStandard();
         result = sortOnKeys(result);
@@ -183,8 +190,8 @@ function addObserverIfDesiredNodeAvailable() {
 
         //console.log('result ', result);
         document.querySelector("#complexOverviewList > div > div.item_area > div").scrollTop = 
-          global_apt_height = document.querySelector("#complexOverviewList > div > div.item_area > div").scrollHeight;
-        
+          document.querySelector("#complexOverviewList > div > div.item_area > div").scrollHeight;
+
         //document.querySelector("#complexOverviewList > div > div.item_area > div").scrollTop = 0;
       });
     });
