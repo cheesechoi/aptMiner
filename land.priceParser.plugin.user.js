@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
-// @version     0.13
+// @version     0.14
 // @author      cheesy
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
@@ -65,7 +65,10 @@ function checkItemCondition(tradeType, floor, spec) {
 
 function parsePrice(tradePrice) {
     tradePrice = tradePrice.replace(" ", "").replace(",", "");
-    return parseInt(tradePrice.split("억")[0] * 10000) + (parseInt(tradePrice.split("억")[1]) || 0);
+    if (tradePrice.includes("억"))
+        return parseInt(tradePrice.split("억")[0] * 10000) + (parseInt(tradePrice.split("억")[1]) || 0);
+    else
+        return parseInt(tradePrice)
 }
 
 function getPrice_WeolbuStandard() {
@@ -206,3 +209,4 @@ function addObserverIfDesiredNodeAvailable() {
 }
 
 addObserverIfDesiredNodeAvailable();
+
