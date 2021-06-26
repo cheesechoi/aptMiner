@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
-// @version     0.14
+// @version     0.15
 // @author      cheesy
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
@@ -112,27 +112,41 @@ function getPrice_WeolbuStandard() {
 
 function addInfoToScreen(infos) {
 
+    var oldScreenInfo = document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_price_info");
+    if (oldScreenInfo)
+        oldScreenInfo.remove();
+
+    var screenInfo = document.createElement('div');
+    screenInfo.setAttribute('class', 'complex_price_info');
+    screenInfo.style.marginTop = "10px";
+
     for (let size in infos) {
-        var screenInfo = document.querySelectorAll("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl");
+
         var priceInfo = "";
         priceInfo += (infos[size]['매매'] ? infos[size]['매매'] : "0") + " / ";
         priceInfo += (infos[size]['전세'] ? infos[size]['전세'] : "0");
+
+        var additionalInfos = [];
         if (infos[size]['매매'] && infos[size]['전세']) {
-            priceInfo += " (" + (infos[size]['갭'] ? infos[size]['갭'] : "-") + ", ";
-            priceInfo += (infos[size]['전세가율'] ? infos[size]['전세가율'] : "-") + ")";
+            additionalInfos.push(infos[size]['갭']);
+            additionalInfos.push(infos[size]['전세가율']);
         }
 
-        var dl = Array.from(screenInfo).find(el => el.textContent.includes(size));
-        if (dl)
-            dl.remove();
+        if (infos[size]['매매']) {
+            var py = parseInt(/\d+/g.exec(size), 10) / 3.3;
+            additionalInfos.push(parseInt(infos[size]['매매'] / py) + "/m²");
+        }
+
+        priceInfo += "  (" + additionalInfos.join(", ") + ")";
 
         var cloned = document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl:nth-child(1)").cloneNode(true);
         cloned.setAttribute("added", true);
         cloned.getElementsByClassName("title")[0].innerText = size;
         cloned.getElementsByClassName("data")[0].innerText = priceInfo;
-        document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div").appendChild(cloned);
-
+        screenInfo.appendChild(cloned);
     }
+
+    document.querySelector("#summaryInfo > div.complex_summary_info").insertBefore(screenInfo, document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_detail_link"))
 }
 
 function sortOnKeys(dict) {
@@ -209,4 +223,3 @@ function addObserverIfDesiredNodeAvailable() {
 }
 
 addObserverIfDesiredNodeAvailable();
-
