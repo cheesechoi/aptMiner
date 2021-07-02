@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
-// @version     0.16
+// @version     0.17
 // @author      cheesy
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
@@ -134,7 +134,7 @@ function addInfoToScreen(infos) {
 
         if (infos[size]['매매']) {
             var py = parseInt(/\d+/g.exec(size), 10) / 3.3;
-            additionalInfos.push(parseInt(infos[size]['매매'] / py) + "/m²");
+            additionalInfos.push(parseInt(infos[size]['매매'] / py) + "/3.3m²");
         }
 
         if (additionalInfos.length > 0)
