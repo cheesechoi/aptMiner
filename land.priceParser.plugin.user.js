@@ -2,8 +2,8 @@
 // @name        부동산 매물 가격 필터 for 월부
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
-// @version     0.17
-// @author      cheesy
+// @version     0.19
+// @author      cheese
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
 // @updateURL   https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
@@ -27,6 +27,10 @@ function checkMandantoryCondition(size) {
     return true;
 }
 
+function getFloor(strFloor) {
+    return strFloor.replace("층", "").split('/');
+}
+
 function checkItemCondition(tradeType, floor, spec) {
 
     //매매, 전세
@@ -41,25 +45,26 @@ function checkItemCondition(tradeType, floor, spec) {
         return false;
     }
 
-    //// 층
-    // 층 명확하지 않은 것 제외
-    var _floorInfo = floor.replace("층", "").split('/'); // 
-    if (_floorInfo[0] == "저" || _floorInfo[0] == "고") {
-        //console.log('Filtered by floor - ', _floorInfo);
-        return false;
-    }
-    // 1층, 탑층 제외
-    if (_floorInfo[0] == "1" || _floorInfo[0] == _floorInfo[1]) {
-        //console.log('Filtered by floor - ', _floorInfo);
-        return false;
-    }
+    // 층 - 전세의 경우 층에 관계없이 최고가 적용
+    if (tradeType == "매매") {
+        // 층 명확하지 않은 것 제외
+        var _floorInfo = getFloor(floor);
+        if (_floorInfo[0] == "저") {
+            //console.log('Filtered by floor - ', _floorInfo);
+            return false;
+        }
+        // 1층, 2층, 탑층 제외
+        if (_floorInfo[0] == "1" || _floorInfo[0] == "2" || _floorInfo[0] == _floorInfo[1]) {
+            //console.log('Filtered by floor - ', _floorInfo);
+            return false;
+        }
 
-    // 5층 이상 건물에서 3층 이하 제외
-    if (_floorInfo[1] >= 5 && _floorInfo[0] <= 3) {
-        //console.log('Filtered by floor - ', _floorInfo);
-        return false;
+        // 5층 이상 건물에서 3층 이하 제외
+        if (_floorInfo[1] >= 5 && _floorInfo[0] <= 3) {
+            //console.log('Filtered by floor - ', _floorInfo);
+            return false;
+        }
     }
-
     return true;
 }
 
@@ -89,7 +94,7 @@ function getPrice_WeolbuStandard() {
             return;
         }
         if (!(size in dictPricePerSize))
-            dictPricePerSize[size] = { '매매': null, '전세': null, '갭': null, '전세가율': null };
+            dictPricePerSize[size] = { '매매': null, '전세': null, '갭': null, '전세가율': null, '매매층': null, '전세층': null };
 
         if (!checkItemCondition(tradeType, floor, spec)) {
             return;
@@ -99,6 +104,7 @@ function getPrice_WeolbuStandard() {
             (tradeType == "매매" && dictPricePerSize[size][tradeType] > tradePrice) ||
             (tradeType == "전세" && dictPricePerSize[size][tradeType] < tradePrice)) {
             dictPricePerSize[size][tradeType] = tradePrice;
+            dictPricePerSize[size][tradeType + "층"] = getFloor(floor)[0];
         }
 
         if (dictPricePerSize[size]['매매'] & dictPricePerSize[size]['전세']) {
@@ -123,8 +129,8 @@ function addInfoToScreen(infos) {
     for (let size in infos) {
 
         var priceInfo = "";
-        priceInfo += (infos[size]['매매'] ? infos[size]['매매'] : "0") + " / ";
-        priceInfo += (infos[size]['전세'] ? infos[size]['전세'] : "0");
+        priceInfo += (infos[size]['매매'] ? infos[size]['매매'] + " (" + infos[size]['매매층'] + ")" : "0") + " / ";
+        priceInfo += (infos[size]['전세'] ? infos[size]['전세'] + " (" + infos[size]['전세층'] + ")" : "0");
 
         var additionalInfos = [];
         if (infos[size]['매매'] && infos[size]['전세']) {
