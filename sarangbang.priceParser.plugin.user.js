@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부 - 사랑방
 // @namespace   Violentmonkey Scripts
 // @match       https://home.sarangbang.com/v2/maps*
-// @version     1.0
+// @version     1.001
 // @author      치즈0
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/sarangbang.priceParser.plugin.user.js
@@ -44,7 +44,7 @@ function gatheringPriceInfo() {
       numBuilding = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.dongnum.text-2").textContent;
       floor = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.floor.text-2").textContent;
 
-      console.log(tradeType, area, areaPrivate, numBuilding, floor, price);
+      //console.log(tradeType, area, areaPrivate, numBuilding, floor, price);
       aptHash = hash("".concat(tradeType, area, areaPrivate, numBuilding, floor, price))
       
 
@@ -70,7 +70,7 @@ function addInfoToScreen(infos) {
 
     var oldScreenInfo = document.querySelector("#contInfo > div > div.detail-head > div.detail-head-inner > div.complex_price_info");
     if (oldScreenInfo) {
-      console.log('removed');
+        //console.log('removed');
         oldScreenInfo.remove();
     }
  
@@ -81,7 +81,7 @@ function addInfoToScreen(infos) {
     
   
     for (let size in infos['areaInfo']) {
-        console.log(size);
+        //console.log(size);
 
         var priceInfo = "";
         priceInfo += size + " 매매 " + infos['areaInfo'][size]['매매'] + " 전세 " + infos['areaInfo'][size]['전세'] + "\n";
@@ -163,7 +163,7 @@ function sortOnKeys(dict) {
 var g_lastSelectedApt = "";
 
 function addObserverIfDesiredNodeAvailable() {
-  console.log("?");
+    //console.log("?");
     var target = document.getElementsByClassName('content-wrap')[0];
     //console.log(target);
     if (!target)
