@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부 - 사랑방
 // @namespace   Violentmonkey Scripts
 // @match       https://home.sarangbang.com/v2/maps*
-// @version     1.001
+// @version     1.002
 // @author      치즈0
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/sarangbang.priceParser.plugin.user.js
@@ -84,7 +84,7 @@ function addInfoToScreen(infos) {
         //console.log(size);
 
         var priceInfo = "";
-        priceInfo += size + " 매매 " + infos['areaInfo'][size]['매매'] + " 전세 " + infos['areaInfo'][size]['전세'] + "\n";
+        priceInfo += size + " 매매 " + infos['areaInfo'][size]['매매'] + ", 전세 " + infos['areaInfo'][size]['전세'] + ", ";
       
             
         var lowPrice = undefined;
@@ -123,13 +123,13 @@ function addInfoToScreen(infos) {
   
   
      
-        priceInfo += (lowPrice !== undefined) ? lowPrice['price'] + " (" + lowPrice['floor'] + ") / " : "0" + " / ";
-        priceInfo += (highLease !== undefined) ? highLease['price'] + " (" + highLease['floor'] + ") " : "0 ";
+        priceInfo += (lowPrice !== undefined) ? (lowPrice['price']/10000).toFixed(2) + "억 (" + lowPrice['floor'] + ") / " : "0" + " / ";
+        priceInfo += (highLease !== undefined) ? (highLease['price']/10000).toFixed(2) + "억 (" + highLease['floor'] + ") " : "0 ";
 
         var additionalInfos = [];
         if (lowPrice !== undefined  && highLease !== undefined ) {
-            priceInfo += (lowPrice['price'] - highLease['price']) + ", "; // 갭
-            priceInfo += Math.floor(highLease['price'] / lowPrice['price'] * 100)+"%"; // 갭
+            priceInfo += ", "+((lowPrice['price'] - highLease['price'])/10000).toFixed(2) + "억, "; // 갭
+            priceInfo += Math.floor(highLease['price'] / lowPrice['price'] * 100)+"%"; // 전세가율
         }
 
         var cloned = document.querySelector("#contInfo > div > div.detail-head > div.detail-head-inner > h2").cloneNode(true);
@@ -138,7 +138,7 @@ function addInfoToScreen(infos) {
         screenInfo.appendChild(cloned);
     }
 
-    document.querySelector("#contInfo > div > div.detail-head > div.detail-head-inner").insertBefore(screenInfo, document.querySelector("#contInfo > div > div.detail-head > div.detail-head-inner > h2"))
+    document.querySelector("#contInfo > div > div.detail-head > div.detail-head-inner").insertBefore(screenInfo, document.querySelector("#contInfo > div > div.detail-head > div.detail-head-inner > h2").nextSibling)
 }
 
 function sortOnKeys(dict) {
@@ -198,3 +198,4 @@ function addObserverIfDesiredNodeAvailable() {
 }
 
 addObserverIfDesiredNodeAvailable();
+
