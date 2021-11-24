@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부 - 사랑방
 // @namespace   Violentmonkey Scripts
 // @match       https://home.sarangbang.com/v2/maps*
-// @version     1.003
+// @version     1.004
 // @author      치즈0
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/sarangbang.priceParser.plugin.user.js
@@ -39,26 +39,33 @@ function gatheringPriceInfo() {
    
       tradeType = ele.querySelector("div > div > a > div.lst-price.text-primary > span > span:nth-child(1)").textContent;
       if (tradeType == "매매" || tradeType == "전세") {
-        price = parsePrice(ele.querySelector("div > div > a > div.lst-price.text-primary > span > span.mr-1 > span > em").textContent);
-        area = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.mr-2.text-2.lst-area > span.mr-1.area-open > em").textContent;
-        areaPrivate = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.mr-2.text-2.lst-area > span.text-color-grey.area-private > em").textContent;
-        numBuilding = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.dongnum.text-2").textContent;
-        floor = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.floor.text-2").textContent;
 
-        //console.log(tradeType, area, areaPrivate, numBuilding, floor, price);
-        aptHash = hash("".concat(tradeType, area, areaPrivate, numBuilding, floor, price))
+        _price = ele.querySelector("div > div > a > div.lst-price.text-primary > span > span.mr-1 > span > em");
+        _area = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.mr-2.text-2.lst-area > span.mr-1.area-open > em");
+        _areaPrivate = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.mr-2.text-2.lst-area > span.text-color-grey.area-private > em");
+        _numBuilding = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.dongnum.text-2");
+        _floor = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.floor.text-2");
 
-        if (collection[aptHash] === undefined) {
-          collection[aptHash] = { 'tradeType' : tradeType, 'price' : price, 'area' : area, 'areaPrivate' : areaPrivate, 'numBuilding' : numBuilding, 'floor' : floor, 'count': 1 };
-          if (collection['areaInfo'][area] === undefined) {
-            collection['areaInfo'][area] = { '매매': 0, '전세': 0 };
+      if (_price && _area && _areaPrivate &&_numBuilding && _floor) {
+          price = parsePrice(_price.textContent);
+          area = _area.textContent;
+          areaPrivate = _areaPrivate.textContent;
+          numBuilding = _numBuilding.textContent;
+          floor = _floor.textContent;
+
+          //console.log(tradeType, area, areaPrivate, numBuilding, floor, price);
+          aptHash = hash("".concat(tradeType, area, areaPrivate, numBuilding, floor, price))
+
+          if (collection[aptHash] === undefined) {
+            collection[aptHash] = { 'tradeType' : tradeType, 'price' : price, 'area' : area, 'areaPrivate' : areaPrivate, 'numBuilding' : numBuilding, 'floor' : floor, 'count': 1 };
+            if (collection['areaInfo'][area] === undefined) {
+              collection['areaInfo'][area] = { '매매': 0, '전세': 0 };
+            }
+            collection['areaInfo'][area][tradeType] += 1;
           }
-          collection['areaInfo'][area][tradeType] += 1;
-        }
-        else {
-
-            collection[aptHash]['count'] += 1;
-
+          else {
+              collection[aptHash]['count'] += 1;
+          }
         }
       }
     });
@@ -197,5 +204,6 @@ function addObserverIfDesiredNodeAvailable() {
 }
 
 addObserverIfDesiredNodeAvailable();
+
 
 
