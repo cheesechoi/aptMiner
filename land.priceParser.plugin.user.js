@@ -2,8 +2,8 @@
 // @name        부동산 매물 가격 필터 for 월부
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
-// @version     0.19
-// @author      cheese
+// @version     1.0
+// @author      치즈0
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
 // @updateURL   https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
@@ -40,9 +40,11 @@ function checkItemCondition(tradeType, floor, spec) {
     }
 
     // 세안고 제외
-    if (spec.includes("세안고")) {
-        //console.log('Filtered by floor - ', _floorInfo);
+    if (spec.includes("끼고") || spec.includes("안고") || spec.includes("승계")) {
+        //console.log('Filtered by spec - ', spec);
         return false;
+    } else {
+      //console.log('Allowed spec - ', spec);
     }
 
     // 층 - 전세의 경우 층에 관계없이 최고가 적용
@@ -128,10 +130,9 @@ function addInfoToScreen(infos) {
 
     for (let size in infos) {
 
-        var priceInfo = "";
-        priceInfo += (infos[size]['매매'] ? infos[size]['매매'] + " (" + infos[size]['매매층'] + ")" : "0") + " / ";
-        priceInfo += (infos[size]['전세'] ? infos[size]['전세'] + " (" + infos[size]['전세층'] + ")" : "0");
-
+        var strTradePriceInfo = (infos[size]['매매'] ? infos[size]['매매'] + "/" + infos[size]['매매층'] : "0/-");
+        var strLeasePriceInfo = (infos[size]['전세'] ? infos[size]['전세'] + "/" + infos[size]['전세층'] : "0/-");
+        
         var additionalInfos = [];
         if (infos[size]['매매'] && infos[size]['전세']) {
             additionalInfos.push(infos[size]['갭']);
@@ -142,14 +143,39 @@ function addInfoToScreen(infos) {
             var py = parseInt(/\d+/g.exec(size), 10) / 3.3;
             additionalInfos.push(parseInt(infos[size]['매매'] / py) + "/3.3m²");
         }
-
+      
+        var strAdditionalInfo = "";
         if (additionalInfos.length > 0)
-            priceInfo += "  (" + additionalInfos.join(", ") + ")";
+            strAdditionalInfo += "  (" + additionalInfos.join(", ") + ")";
 
         var cloned = document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl:nth-child(1)").cloneNode(true);
         cloned.setAttribute("added", true);
         cloned.getElementsByClassName("title")[0].innerText = size;
-        cloned.getElementsByClassName("data")[0].innerText = priceInfo;
+      
+        var trade = cloned.getElementsByClassName("data")[0];
+        var lease = trade.cloneNode(true);
+        var additionalInfo = trade.cloneNode(true);
+        var delim = trade.cloneNode(true);
+
+        // remove, then reordering (please make it more fancy)        
+        trade.innerText = strTradePriceInfo;
+        trade.style.color = '#f34c59';
+        lease.innerText = strLeasePriceInfo;
+        lease.style.color = '#4c94e8';
+        delim.innerText = " / ";
+        delim.style.color = '#ffffff';
+        additionalInfo.innerText = strAdditionalInfo;
+
+        // remove, then reordering (please make it fancy..)        
+        cloned.removeChild(trade);
+
+        cloned.appendChild(delim);
+        cloned.appendChild(trade);
+        cloned.appendChild(delim.cloneNode(true));
+        cloned.appendChild(lease);
+        cloned.appendChild(delim.cloneNode(true));
+        cloned.appendChild(additionalInfo);
+        
         screenInfo.appendChild(cloned);
     }
 
@@ -179,15 +205,15 @@ function sortOnKeys(dict) {
 var g_lastSelectedApt = "";
 
 function addObserverIfDesiredNodeAvailable() {
-
     var target = document.getElementsByClassName('map_wrap')[0];
+    
     if (!target)
         return;
 
     var observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             [].slice.call(mutation.addedNodes).forEach(function(addedNode) {
-
+                //console.log('???');
                 //console.log(addedNode.classList);
                 if (!addedNode.classList ||
                     (!addedNode.classList.contains('infinite_scroll') && !addedNode.classList.contains('item'))) {
