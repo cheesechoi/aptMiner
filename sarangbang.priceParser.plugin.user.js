@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부 - 사랑방
 // @namespace   Violentmonkey Scripts
 // @match       https://home.sarangbang.com/v2/maps*
-// @version     1.004
+// @version     1.005
 // @author      치즈0
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/sarangbang.priceParser.plugin.user.js
@@ -36,17 +36,15 @@ function gatheringPriceInfo() {
     collection['areaInfo'] = {};
   
     document.querySelectorAll("#listWrap > li").forEach(function(ele) {
-   
       tradeType = ele.querySelector("div > div > a > div.lst-price.text-primary > span > span:nth-child(1)").textContent;
       if (tradeType == "매매" || tradeType == "전세") {
-
         _price = ele.querySelector("div > div > a > div.lst-price.text-primary > span > span.mr-1 > span > em");
         _area = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.mr-2.text-2.lst-area > span.mr-1.area-open > em");
         _areaPrivate = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.mr-2.text-2.lst-area > span.text-color-grey.area-private > em");
         _numBuilding = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.dongnum.text-2");
         _floor = ele.querySelector("div > div > a > div.d-flex.flex-wrap > span.floor.text-2");
 
-      if (_price && _area && _areaPrivate &&_numBuilding && _floor) {
+        if (_price && _area && _areaPrivate && _numBuilding && _floor) {
           price = parsePrice(_price.textContent);
           area = _area.textContent;
           areaPrivate = _areaPrivate.textContent;
@@ -104,17 +102,27 @@ function addInfoToScreen(infos) {
 
             if (!item['area'].startsWith(size))
                 continue;
-            
+
             if (item['tradeType'] == "매매") {
+                //console.log(item['area'] + ' ' + item['floor'] + ' ' + item['price'])
                 if (lowPrice == undefined) {
                     lowPrice = item;
                 } else {
-                    if (lowPrice['floor'])
-                    if ((item['floor'] != "1층" && item['floor'] != "2층" && item['floor'] != "3층" )
-                        && (lowPrice['floor'] == "1층" || lowPrice['floor'] == "2층" || lowPrice['floor'] == "3층" ))
-                        lowPrice = item;
-                    if (item['price'] < lowPrice['price'])
-                        lowPrice = item;
+                    isLowFloor = (item['floor'] == "1층" || item['floor'] == "2층" || item['floor'] == "3층")
+                    isLowestPriceLowFloor = (lowPrice['floor'] == "1층" || lowPrice['floor'] == "2층" || lowPrice['floor'] == "3층")
+
+                    if (isLowFloor) {
+                        if (isLowestPriceLowFloor && (item['price'] < lowPrice['price']))
+                            lowPrice = item;
+                    } else {
+                        if (isLowestPriceLowFloor)
+                            lowPrice = item;
+
+                        else if (item['price'] < lowPrice['price']) {
+                            //console.log('- lowPrice '+ lowPrice + ' to '+item['price'])
+                            lowPrice = item;
+                        }
+                    }
                 }
             }
             else if (item['tradeType'] == "전세") {
@@ -186,7 +194,7 @@ function addObserverIfDesiredNodeAvailable() {
                 }              
                 
                 collection = gatheringPriceInfo();
-                console.log(collection);
+                //console.log(collection);
                 addInfoToScreen(collection);
                 
                 document.querySelector("#listWrap").scrollIntoView(false);
