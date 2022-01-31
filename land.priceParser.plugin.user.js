@@ -2,7 +2,7 @@
 // @name        부동산 매물 가격 필터 for 월부
 // @namespace   Violentmonkey Scripts
 // @match       https://new.land.naver.com/complexes*
-// @version     1.0
+// @version     1.01
 // @author      치즈0
 // @description Please use with violentmonkey
 // @downloadURL https://raw.githubusercontent.com/cheesechoi/aptMiner/main/land.priceParser.plugin.user.js
@@ -18,8 +18,8 @@ function waitUntilAptListLoaded() {
 }
 
 function checkMandantoryCondition(size) {
-    // 35평 미만
-    if (/\d+/g.exec(size) > (35 * 3.3)) {
+    // 84 미만
+    if (/\d+/g.exec(size) > 120) {
         //console.log('Filtered by size - ', size);
         return false;
     }
@@ -44,7 +44,7 @@ function checkItemCondition(tradeType, floor, spec) {
         //console.log('Filtered by spec - ', spec);
         return false;
     } else {
-      //console.log('Allowed spec - ', spec);
+        //console.log('Allowed spec - ', spec);
     }
 
     // 층 - 전세의 경우 층에 관계없이 최고가 적용
@@ -132,7 +132,7 @@ function addInfoToScreen(infos) {
 
         var strTradePriceInfo = (infos[size]['매매'] ? infos[size]['매매'] + "/" + infos[size]['매매층'] : "0/-");
         var strLeasePriceInfo = (infos[size]['전세'] ? infos[size]['전세'] + "/" + infos[size]['전세층'] : "0/-");
-        
+
         var additionalInfos = [];
         if (infos[size]['매매'] && infos[size]['전세']) {
             additionalInfos.push(infos[size]['갭']);
@@ -143,7 +143,7 @@ function addInfoToScreen(infos) {
             var py = parseInt(/\d+/g.exec(size), 10) / 3.3;
             additionalInfos.push(parseInt(infos[size]['매매'] / py) + "/3.3m²");
         }
-      
+
         var strAdditionalInfo = "";
         if (additionalInfos.length > 0)
             strAdditionalInfo += "  (" + additionalInfos.join(", ") + ")";
@@ -151,7 +151,7 @@ function addInfoToScreen(infos) {
         var cloned = document.querySelector("#summaryInfo > div.complex_summary_info > div.complex_trade_wrap > div > dl:nth-child(1)").cloneNode(true);
         cloned.setAttribute("added", true);
         cloned.getElementsByClassName("title")[0].innerText = size;
-      
+
         var trade = cloned.getElementsByClassName("data")[0];
         var lease = trade.cloneNode(true);
         var additionalInfo = trade.cloneNode(true);
@@ -175,7 +175,7 @@ function addInfoToScreen(infos) {
         cloned.appendChild(lease);
         cloned.appendChild(delim.cloneNode(true));
         cloned.appendChild(additionalInfo);
-        
+
         screenInfo.appendChild(cloned);
     }
 
@@ -206,7 +206,7 @@ var g_lastSelectedApt = "";
 
 function addObserverIfDesiredNodeAvailable() {
     var target = document.getElementsByClassName('map_wrap')[0];
-    
+
     if (!target)
         return;
 
