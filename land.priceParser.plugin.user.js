@@ -39,6 +39,7 @@ function checkItemCondition(tradeType, floor, spec) {
         return false;
     }
 
+    /* // 하락장 진입으로 인해 세안은 물건이 더 메리트있는 경우가 생김. 상승장 시 재적용.
     // 세안고 제외
     if (spec.includes("끼고") || spec.includes("안고") || spec.includes("승계")) {
         //console.log('Filtered by spec - ', spec);
@@ -46,6 +47,7 @@ function checkItemCondition(tradeType, floor, spec) {
     } else {
         //console.log('Allowed spec - ', spec);
     }
+    */
 
     // 층 - 전세의 경우 층에 관계없이 최고가 적용
     if (tradeType == "매매") {
@@ -104,7 +106,9 @@ function getPrice_WeolbuStandard() {
 
         if ((dictPricePerSize[size][tradeType] == null) ||
             (tradeType == "매매" && dictPricePerSize[size][tradeType] > tradePrice) ||
-            (tradeType == "전세" && dictPricePerSize[size][tradeType] < tradePrice)) {
+            (tradeType == "전세" && dictPricePerSize[size][tradeType] > tradePrice)) {
+            // 하락장을 맞아 전세가 최저가로 적용
+            //(tradeType == "전세" && dictPricePerSize[size][tradeType] < tradePrice)) {
             dictPricePerSize[size][tradeType] = tradePrice;
             dictPricePerSize[size][tradeType + "층"] = getFloor(floor)[0];
         }
